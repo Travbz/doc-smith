@@ -1,0 +1,76 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Repository Analysis API",
+        "version": "1.0.0",
+        "description": "API for analyzing repository structure and generating documentation tasks"
+    },
+    "paths": {
+        "/analyze": {
+            "post": {
+                "description": "Analyze a repository and generate documentation tasks",
+                "operationId": "analyzeRepository",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "repo_path": {
+                                        "type": "string",
+                                        "description": "Path to repository"
+                                    }
+                                },
+                                "required": ["repo_path"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful analysis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "structure": {
+                                            "type": "object",
+                                            "description": "Repository file structure",
+                                            "additionalProperties": true
+                                        },
+                                        "tasks": {
+                                            "type": "array",
+                                            "description": "Documentation tasks",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": ["documentation"]
+                                                    },
+                                                    "file_path": {
+                                                        "type": "string",
+                                                        "description": "Path to the file"
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "minimum": 0,
+                                                        "description": "Task priority (higher is more important)"
+                                                    }
+                                                },
+                                                "required": ["type", "file_path", "priority"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["structure", "tasks"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

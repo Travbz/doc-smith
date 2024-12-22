@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "file": {
+            "type": "string",
+            "description": "Path to the analyzed file"
+        },
+        "language": {
+            "type": "string",
+            "description": "Programming language"
+        },
+        "code": {
+            "type": "string",
+            "description": "Original source code"
+        }
+    },
+    "required": ["file", "language", "code"],
+    "responses": {
+        "type": "object",
+        "properties": {
+            "analysis": {
+                "type": "object",
+                "properties": {
+                    "overview": {
+                        "type": "object",
+                        "properties": {
+                            "purpose": {
+                                "type": "string",
+                                "description": "Main purpose of the code"
+                            },
+                            "key_features": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "components": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["class", "function", "method", "interface"]
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "parameters": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                            "type": {"type": "string"},
+                                            "description": {"type": "string"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "patterns": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "description": {"type": "string"},
+                                "usage": {"type": "string"}
+                            }
+                        }
+                    },
+                    "dependencies": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "type": {"type": "string"},
+                                "usage": {"type": "string"}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "required": ["analysis"]
+    }
+}

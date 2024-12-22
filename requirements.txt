@@ -1,0 +1,7 @@
+openai
+gitpython
+PyGithub
+python-dotenv
+aiohttp
+async-timeout
+tiktoken

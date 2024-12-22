@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Pull request title"
+        },
+        "body": {
+            "type": "string",
+            "description": "Pull request description"
+        },
+        "branch": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Branch name"
+                },
+                "base": {
+                    "type": "string",
+                    "description": "Base branch name (e.g., main)"
+                }
+            },
+            "required": ["name", "base"]
+        },
+        "files": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "File path"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "File content"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["documentation", "config", "other"],
+                        "description": "Type of file"
+                    }
+                },
+                "required": ["path", "content", "type"]
+            }
+        },
+        "labels": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Labels to apply to the PR"
+        },
+        "draft": {
+            "type": "boolean",
+            "description": "Whether this is a draft PR",
+            "default": false
+        },
+        "reviewers": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "GitHub usernames to request review from"
+        }
+    },
+    "required": ["title", "body", "branch", "files"],
+    "responses": {
+        "type": "object",
+        "properties": {
+            "pull_request_url": {
+                "type": "string",
+                "description": "URL of the created pull request"
+            }
+        },
+        "required": ["pull_request_url"]
+    }
+}
