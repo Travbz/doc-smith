@@ -1,31 +1,49 @@
+from typing import Dict, Any
+import git
+import tempfile
 import os
-from agency_swarm.agents import Agent
 
-class GitHubAgent(Agent):
-    def __init__(self):
-        # Get environment variables or use defaults
-        max_tokens = int(os.getenv('DOCSMITH_GITHUB_MAX_TOKENS', '25000'))
-        temperature = float(os.getenv('DOCSMITH_GITHUB_TEMPERATURE', '0.2'))
-        github_token = os.getenv('GITHUB_TOKEN')
-        base_branch = os.getenv('DOCSMITH_GITHUB_BASE_BRANCH', 'main')
-        pr_draft = os.getenv('DOCSMITH_GITHUB_PR_DRAFT', 'false').lower() == 'true'
-        pr_labels = os.getenv('DOCSMITH_GITHUB_PR_LABELS', 'documentation,automated').split(',')
+class GitHubAgent:
+    def __init__(self, agency):
+        self.agency = agency
 
-        if not github_token:
-            raise ValueError("GITHUB_TOKEN environment variable is not set")
-
-        super().__init__(
-            name="GitHubAgent",
-            description="The GitHub agent manages all GitHub operations for documentation updates.",
-            instructions="./instructions.md",
-            files_folder="./files",
-            schemas_folder="./schemas",
-            tools_folder="./tools",
-            temperature=temperature,
-            max_prompt_tokens=max_tokens,
-        )
+    async def handle_task(self, task: Dict[str, Any]) -> Dict:
+        task_types = {
+            "prepare_repository": self._prepare_repo,
+            "create_pull_request": self._create_pr
+        }
         
-        self.github_token = github_token
-        self.base_branch = base_branch
-        self.pr_draft = pr_draft
-        self.pr_labels = pr_labels
+        handler = task_types.get(task["type"])
+        if not handler:
+            raise ValueError(f"Unknown task type: {task['type']}")
+        return await handler(task)
+
+    async def _prepare_repo(self, task: Dict) -> Dict:
+        temp_dir = tempfile.mkdtemp()
+        repo = git.Repo.clone_from(task["repo_url"], temp_dir)
+        return {
+            "repo_path": temp_dir,
+            "default_branch": repo.active_branch.name,
+            "repo_url": task["repo_url"]
+        }
+
+    async def _create_pr(self, task: Dict) -> Dict:
+        repo_info = task["repo_info"]
+        docs = task["documentation"]
+        
+        repo = git.Repo(repo_info["repo_path"])
+        branch = f"docs/auto-generated-{os.urandom(4).hex()}"
+        
+        repo.git.checkout('-b', branch)
+        self._write_documentation(repo_info["repo_path"], docs)
+        repo.index.add('*')
+        repo.index.commit("docs: Add auto-generated documentation")
+        
+        return {"branch": branch, "files": list(docs.keys())}
+
+    def _write_documentation(self, repo_path: str, docs: Dict) -> None:
+        for file_path, content in docs.items():
+            full_path = os.path.join(repo_path, file_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(content)
