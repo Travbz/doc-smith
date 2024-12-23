@@ -1,0 +1,52 @@
+flowchart TB
+    subgraph Init["1. Initial Setup"]
+        C[Config Setup]
+        M[Model Configuration]
+        E[Environment Setup]
+    end
+
+    subgraph Core["2. Core Components"]
+        LL[LLM Integration]
+        OA[OpenAI Client]
+        TC[Token Counter]
+        CC[Cost Calculator]
+    end
+
+    subgraph Agents["3. Agent Implementation"]
+        CA[Code Analysis Agent]
+        AA[Architecture Agent]
+        DA[Documentation Agent]
+        RA[Review Agent]
+    end
+
+    subgraph Workflows["4. Workflow Implementation"]
+        W1[API Documentation]
+        W2[Dependency Analysis]
+        W3[Schema Generation]
+    end
+
+    subgraph Integration["5. System Integration"]
+        O[Orchestrator]
+        R[Router]
+        Q[Queue Manager]
+    end
+
+    subgraph Output["6. Output Generation"]
+        DG[Doc Generator]
+        PR[PR Creator]
+        V[Validator]
+    end
+
+    Init --> Core
+    Core --> Agents
+    Core --> Workflows
+    Agents --> Integration
+    Workflows --> Integration
+    Integration --> Output
+
+    style Init fill:#f9f,stroke:#333
+    style Core fill:#bbf,stroke:#333
+    style Agents fill:#bfb,stroke:#333
+    style Workflows fill:#fbf,stroke:#333
+    style Integration fill:#fbb,stroke:#333
+    style Output fill:#bff,stroke:#333
